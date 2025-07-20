@@ -34,13 +34,6 @@ public static class SeedData
             Commentaire = "Pas mal le film",
         };
 
-        drame.Films.Add(film);
-        romance.Films.Add(film);
-        pays.Films.Add(film);
-        realisateur.Films.Add(film);
-        acteur.Films.Add(film);
-        compositeur.Films.Add(film);
-
         context.Films.Add(film);
 
         context.SaveChanges();
