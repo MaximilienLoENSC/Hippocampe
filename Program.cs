@@ -1,4 +1,4 @@
-SeedData.Init();
+//SeedData.Init();
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,4 +26,5 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.MapControllers();
+app.UseCors("AllowAll");
 app.Run();
