@@ -16,16 +16,20 @@ public class GenreController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<GenreDto>>> GetGenres()
     {
-        var genresDto = await _context.Genres.Select(a => new GenreDto(a)).ToListAsync();
+        var genres = await _context.Genres.Include(a => a.Films).ToListAsync();
 
-        return genresDto;
+        var genresDto = genres.Select(a => new GenreDto(a)).ToList();
+
+        return Ok(genresDto);
     }
 
     // GET: api/genre/{id}
     [HttpGet("{id}")]
     public async Task<ActionResult<GenreDto>> GetGenre(int id)
     {
-        var genre = await _context.Genres.SingleOrDefaultAsync(a => a.Id == id);
+        var genre = await _context
+            .Genres.Include(a => a.Films)
+            .FirstOrDefaultAsync(a => a.Id == id);
 
         if (genre == null)
             return NotFound($"Aucun genre trouvé avec l'ID {id}.");
@@ -37,23 +41,26 @@ public class GenreController : ControllerBase
     [HttpGet("{id}/films")]
     public async Task<ActionResult<IEnumerable<FilmOutputDto>>> GetFilmsDeGenre(int id)
     {
-        var genre = await _context.Genres.FindAsync(id);
+        var genre = await _context
+            .Genres.Include(a => a.Films)
+            .ThenInclude(f => f.Genres)
+            .Include(a => a.Films)
+            .ThenInclude(f => f.Pays)
+            .Include(a => a.Films)
+            .ThenInclude(f => f.Realisateurs)
+            .Include(a => a.Films)
+            .ThenInclude(f => f.Compositeurs)
+            .FirstOrDefaultAsync(a => a.Id == id);
+
         if (genre == null)
             return NotFound($"Aucun genre trouvé avec l'ID {id}.");
 
-        var films = await _context
-            .Films.Include(f => f.Genres)
-            .Include(f => f.Pays)
-            .Include(f => f.Realisateurs)
-            .Include(f => f.Genres)
-            .Include(f => f.Compositeurs)
-            .ToListAsync();
+        var filmsDeGenre = genre.Films.Select(f => new FilmOutputDto(f)).ToList();
 
-        var filmsDeGenre = genre.GetFilms(films).Select(f => new FilmOutputDto(f)).ToList();
-
-        return filmsDeGenre;
+        return Ok(filmsDeGenre);
     }
 
+    /*
     // POST: api/genre
     [HttpPost]
     public async Task<ActionResult<Genre>> PostGenre([FromBody] GenreDto dto)
@@ -105,5 +112,5 @@ public class GenreController : ControllerBase
         await _context.SaveChangesAsync();
 
         return NoContent();
-    }
+    }*/
 }

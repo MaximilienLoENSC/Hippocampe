@@ -11,6 +11,9 @@ public class CompositeurDto
     [JsonPropertyName("prenom")]
     public string Prenom { get; set; } = null!;
 
+    [JsonPropertyName("films")]
+    public List<string> Films { get; set; } = new();
+
     public CompositeurDto() { }
 
     public CompositeurDto(Compositeur compositeur)
@@ -18,5 +21,6 @@ public class CompositeurDto
         Id = compositeur.Id;
         Nom = compositeur.Nom;
         Prenom = compositeur.Prenom;
+        Films = compositeur.Films.Select(f => f.Titre).ToList();
     }
 }

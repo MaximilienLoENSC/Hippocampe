@@ -16,16 +16,20 @@ public class ActeurController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<ActeurDto>>> GetActeurs()
     {
-        var acteursDto = await _context.Acteurs.Select(a => new ActeurDto(a)).ToListAsync();
+        var acteurs = await _context.Acteurs.Include(a => a.Films).ToListAsync();
 
-        return acteursDto;
+        var acteursDto = acteurs.Select(a => new ActeurDto(a)).ToList();
+
+        return Ok(acteursDto);
     }
 
     // GET: api/acteur/{id}
     [HttpGet("{id}")]
     public async Task<ActionResult<ActeurDto>> GetActeur(int id)
     {
-        var acteur = await _context.Acteurs.SingleOrDefaultAsync(a => a.Id == id);
+        var acteur = await _context
+            .Acteurs.Include(a => a.Films)
+            .FirstOrDefaultAsync(a => a.Id == id);
 
         if (acteur == null)
             return NotFound($"Aucun acteur trouvé avec l'ID {id}.");
@@ -37,23 +41,26 @@ public class ActeurController : ControllerBase
     [HttpGet("{id}/films")]
     public async Task<ActionResult<IEnumerable<FilmOutputDto>>> GetFilmsDeActeur(int id)
     {
-        var acteur = await _context.Acteurs.FindAsync(id);
+        var acteur = await _context
+            .Acteurs.Include(a => a.Films)
+            .ThenInclude(f => f.Genres)
+            .Include(a => a.Films)
+            .ThenInclude(f => f.Pays)
+            .Include(a => a.Films)
+            .ThenInclude(f => f.Realisateurs)
+            .Include(a => a.Films)
+            .ThenInclude(f => f.Compositeurs)
+            .FirstOrDefaultAsync(a => a.Id == id);
+
         if (acteur == null)
             return NotFound($"Aucun acteur trouvé avec l'ID {id}.");
 
-        var films = await _context
-            .Films.Include(f => f.Genres)
-            .Include(f => f.Pays)
-            .Include(f => f.Realisateurs)
-            .Include(f => f.Acteurs)
-            .Include(f => f.Compositeurs)
-            .ToListAsync();
+        var filmsDeActeur = acteur.Films.Select(f => new FilmOutputDto(f)).ToList();
 
-        var filmsDeActeur = acteur.GetFilms(films).Select(f => new FilmOutputDto(f)).ToList();
-
-        return filmsDeActeur;
+        return Ok(filmsDeActeur);
     }
 
+    /*
     // POST: api/acteur
     [HttpPost]
     public async Task<ActionResult<Acteur>> PostActeur([FromBody] ActeurDto dto)
@@ -105,5 +112,5 @@ public class ActeurController : ControllerBase
         await _context.SaveChangesAsync();
 
         return NoContent();
-    }
+    }*/
 }

@@ -16,16 +16,18 @@ public class PaysController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<PaysDto>>> GetPays()
     {
-        var payssDto = await _context.Pays.Select(a => new PaysDto(a)).ToListAsync();
+        var pays = await _context.Pays.Include(a => a.Films).ToListAsync();
 
-        return payssDto;
+        var paysDto = pays.Select(a => new PaysDto(a)).ToList();
+
+        return Ok(paysDto);
     }
 
     // GET: api/pays/{id}
     [HttpGet("{id}")]
     public async Task<ActionResult<PaysDto>> GetPays(int id)
     {
-        var pays = await _context.Pays.SingleOrDefaultAsync(a => a.Id == id);
+        var pays = await _context.Pays.Include(a => a.Films).FirstOrDefaultAsync(a => a.Id == id);
 
         if (pays == null)
             return NotFound($"Aucun pays trouvé avec l'ID {id}.");
@@ -37,23 +39,26 @@ public class PaysController : ControllerBase
     [HttpGet("{id}/films")]
     public async Task<ActionResult<IEnumerable<FilmOutputDto>>> GetFilmsDePays(int id)
     {
-        var pays = await _context.Pays.FindAsync(id);
+        var pays = await _context
+            .Pays.Include(a => a.Films)
+            .ThenInclude(f => f.Genres)
+            .Include(a => a.Films)
+            .ThenInclude(f => f.Pays)
+            .Include(a => a.Films)
+            .ThenInclude(f => f.Realisateurs)
+            .Include(a => a.Films)
+            .ThenInclude(f => f.Compositeurs)
+            .FirstOrDefaultAsync(a => a.Id == id);
+
         if (pays == null)
             return NotFound($"Aucun pays trouvé avec l'ID {id}.");
 
-        var films = await _context
-            .Films.Include(f => f.Genres)
-            .Include(f => f.Pays)
-            .Include(f => f.Realisateurs)
-            .Include(f => f.Pays)
-            .Include(f => f.Compositeurs)
-            .ToListAsync();
+        var filmsDePays = pays.Films.Select(f => new FilmOutputDto(f)).ToList();
 
-        var filmsDePays = pays.GetFilms(films).Select(f => new FilmOutputDto(f)).ToList();
-
-        return filmsDePays;
+        return Ok(filmsDePays);
     }
 
+    /*
     // POST: api/pays
     [HttpPost]
     public async Task<ActionResult<Pays>> PostPays([FromBody] PaysDto dto)
@@ -105,5 +110,5 @@ public class PaysController : ControllerBase
         await _context.SaveChangesAsync();
 
         return NoContent();
-    }
+    }*/
 }

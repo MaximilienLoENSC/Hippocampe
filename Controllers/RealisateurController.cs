@@ -16,18 +16,20 @@ public class RealisateurController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<RealisateurDto>>> GetRealisateurs()
     {
-        var realisateursDto = await _context
-            .Realisateurs.Select(a => new RealisateurDto(a))
-            .ToListAsync();
+        var realisateurs = await _context.Realisateurs.Include(a => a.Films).ToListAsync();
 
-        return realisateursDto;
+        var realisateursDto = realisateurs.Select(a => new RealisateurDto(a)).ToList();
+
+        return Ok(realisateursDto);
     }
 
     // GET: api/realisateur/{id}
     [HttpGet("{id}")]
     public async Task<ActionResult<RealisateurDto>> GetRealisateur(int id)
     {
-        var realisateur = await _context.Realisateurs.SingleOrDefaultAsync(a => a.Id == id);
+        var realisateur = await _context
+            .Realisateurs.Include(a => a.Films)
+            .FirstOrDefaultAsync(a => a.Id == id);
 
         if (realisateur == null)
             return NotFound($"Aucun realisateur trouvé avec l'ID {id}.");
@@ -39,26 +41,26 @@ public class RealisateurController : ControllerBase
     [HttpGet("{id}/films")]
     public async Task<ActionResult<IEnumerable<FilmOutputDto>>> GetFilmsDeRealisateur(int id)
     {
-        var realisateur = await _context.Realisateurs.FindAsync(id);
+        var realisateur = await _context
+            .Realisateurs.Include(a => a.Films)
+            .ThenInclude(f => f.Genres)
+            .Include(a => a.Films)
+            .ThenInclude(f => f.Pays)
+            .Include(a => a.Films)
+            .ThenInclude(f => f.Realisateurs)
+            .Include(a => a.Films)
+            .ThenInclude(f => f.Compositeurs)
+            .FirstOrDefaultAsync(a => a.Id == id);
+
         if (realisateur == null)
             return NotFound($"Aucun realisateur trouvé avec l'ID {id}.");
 
-        var films = await _context
-            .Films.Include(f => f.Genres)
-            .Include(f => f.Pays)
-            .Include(f => f.Realisateurs)
-            .Include(f => f.Realisateurs)
-            .Include(f => f.Compositeurs)
-            .ToListAsync();
+        var filmsDeRealisateur = realisateur.Films.Select(f => new FilmOutputDto(f)).ToList();
 
-        var filmsDeRealisateur = realisateur
-            .GetFilms(films)
-            .Select(f => new FilmOutputDto(f))
-            .ToList();
-
-        return filmsDeRealisateur;
+        return Ok(filmsDeRealisateur);
     }
 
+    /*
     // POST: api/realisateur
     [HttpPost]
     public async Task<ActionResult<Realisateur>> PostRealisateur([FromBody] RealisateurDto dto)
@@ -110,5 +112,5 @@ public class RealisateurController : ControllerBase
         await _context.SaveChangesAsync();
 
         return NoContent();
-    }
+    }*/
 }

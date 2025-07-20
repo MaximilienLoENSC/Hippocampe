@@ -11,6 +11,9 @@ public class ActeurDto
     [JsonPropertyName("prenom")]
     public string Prenom { get; set; } = null!;
 
+    [JsonPropertyName("films")]
+    public List<string> Films { get; set; } = new();
+
     public ActeurDto() { }
 
     public ActeurDto(Acteur acteur)
@@ -18,5 +21,6 @@ public class ActeurDto
         Id = acteur.Id;
         Nom = acteur.Nom;
         Prenom = acteur.Prenom;
+        Films = acteur.Films.Select(f => f.Titre).ToList();
     }
 }
