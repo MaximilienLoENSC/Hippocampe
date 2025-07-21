@@ -39,7 +39,7 @@ public class CompositeurController : ControllerBase
 
     // GET: api/compositeur/{id}/films
     [HttpGet("{id}/films")]
-    public async Task<ActionResult<IEnumerable<FilmOutputDto>>> GetFilmsDeCompositeur(int id)
+    public async Task<ActionResult<IEnumerable<FilmDto>>> GetFilmsDeCompositeur(int id)
     {
         var compositeur = await _context
             .Compositeurs.Include(a => a.Films)
@@ -55,7 +55,7 @@ public class CompositeurController : ControllerBase
         if (compositeur == null)
             return NotFound($"Aucun compositeur trouvé avec l'ID {id}.");
 
-        var filmsDeCompositeur = compositeur.Films.Select(f => new FilmOutputDto(f)).ToList();
+        var filmsDeCompositeur = compositeur.Films.Select(f => new FilmDto(f)).ToList();
 
         return Ok(filmsDeCompositeur);
     }

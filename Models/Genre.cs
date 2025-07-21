@@ -1,4 +1,4 @@
-public class Genre
+public class Genre : INommable
 {
     public int Id { get; set; }
     public string Nom { get; set; } = null!;

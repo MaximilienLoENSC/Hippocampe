@@ -1,4 +1,4 @@
-public class Acteur
+public class Acteur : INommable
 {
     public int Id { get; set; }
     public string Nom { get; set; } = null!;

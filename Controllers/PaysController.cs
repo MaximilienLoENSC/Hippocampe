@@ -37,7 +37,7 @@ public class PaysController : ControllerBase
 
     // GET: api/pays/{id}/films
     [HttpGet("{id}/films")]
-    public async Task<ActionResult<IEnumerable<FilmOutputDto>>> GetFilmsDePays(int id)
+    public async Task<ActionResult<IEnumerable<FilmDto>>> GetFilmsDePays(int id)
     {
         var pays = await _context
             .Pays.Include(a => a.Films)
@@ -53,7 +53,7 @@ public class PaysController : ControllerBase
         if (pays == null)
             return NotFound($"Aucun pays trouvé avec l'ID {id}.");
 
-        var filmsDePays = pays.Films.Select(f => new FilmOutputDto(f)).ToList();
+        var filmsDePays = pays.Films.Select(f => new FilmDto(f)).ToList();
 
         return Ok(filmsDePays);
     }

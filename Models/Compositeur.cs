@@ -1,6 +1,4 @@
-using System.Text.Json.Serialization;
-
-public class Compositeur
+public class Compositeur : INommable
 {
     public int Id { get; set; }
     public string Nom { get; set; } = null!;

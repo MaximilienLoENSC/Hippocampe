@@ -39,7 +39,7 @@ public class RealisateurController : ControllerBase
 
     // GET: api/realisateur/{id}/films
     [HttpGet("{id}/films")]
-    public async Task<ActionResult<IEnumerable<FilmOutputDto>>> GetFilmsDeRealisateur(int id)
+    public async Task<ActionResult<IEnumerable<FilmDto>>> GetFilmsDeRealisateur(int id)
     {
         var realisateur = await _context
             .Realisateurs.Include(a => a.Films)
@@ -55,7 +55,7 @@ public class RealisateurController : ControllerBase
         if (realisateur == null)
             return NotFound($"Aucun realisateur trouvé avec l'ID {id}.");
 
-        var filmsDeRealisateur = realisateur.Films.Select(f => new FilmOutputDto(f)).ToList();
+        var filmsDeRealisateur = realisateur.Films.Select(f => new FilmDto(f)).ToList();
 
         return Ok(filmsDeRealisateur);
     }

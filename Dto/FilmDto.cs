@@ -12,20 +12,20 @@ public class FilmDto
     [JsonConverter(typeof(MyCustomJsonConverter))]
     public DateTime DateDeSortie { get; set; }
 
-    [JsonPropertyName("genre_ids")]
-    public List<int> GenreIds { get; set; } = new();
+    [JsonPropertyName("genres")]
+    public List<string> Genres { get; set; } = new();
 
-    [JsonPropertyName("pays_ids")]
-    public List<int> PaysIds { get; set; } = new();
+    [JsonPropertyName("pays")]
+    public List<string> Pays { get; set; } = new();
 
-    [JsonPropertyName("realisateur_ids")]
-    public List<int> RealisateurIds { get; set; } = new();
+    [JsonPropertyName("realisateurs")]
+    public List<string> Realisateurs { get; set; } = new();
 
-    [JsonPropertyName("acteur_ids")]
-    public List<int> ActeurIds { get; set; } = new();
+    [JsonPropertyName("acteurs")]
+    public List<string> Acteurs { get; set; } = new();
 
-    [JsonPropertyName("compositeur_ids")]
-    public List<int> CompositeurIds { get; set; } = new();
+    [JsonPropertyName("compositeurs")]
+    public List<string> Compositeurs { get; set; } = new();
 
     [JsonPropertyName("commentaire")]
     public string Commentaire { get; set; } = null!;
@@ -39,10 +39,10 @@ public class FilmDto
         DateDeSortie = film.DateDeSortie;
         Commentaire = film.Commentaire;
 
-        GenreIds = film.Genres.Select(g => g.Id).ToList();
-        PaysIds = film.Pays.Select(p => p.Id).ToList();
-        RealisateurIds = film.Realisateurs.Select(r => r.Id).ToList();
-        ActeurIds = film.Acteurs.Select(a => a.Id).ToList();
-        CompositeurIds = film.Compositeurs.Select(c => c.Id).ToList();
+        Genres = film.Genres.Select(g => g.Nom).ToList();
+        Pays = film.Pays.Select(p => p.Nom).ToList();
+        Realisateurs = film.Realisateurs.Select(r => r.Nom).ToList();
+        Acteurs = film.Acteurs.Select(a => a.Nom).ToList();
+        Compositeurs = film.Compositeurs.Select(c => c.Nom).ToList();
     }
 }

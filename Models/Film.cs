@@ -33,11 +33,11 @@ public class Film
         DateDeSortie = filmDto.DateDeSortie;
         Commentaire = filmDto.Commentaire;
 
-        Genres = genres.Where(g => filmDto.GenreIds.Contains(g.Id)).ToList();
-        Pays = pays.Where(p => filmDto.PaysIds.Contains(p.Id)).ToList();
-        Realisateurs = realisateurs.Where(r => filmDto.RealisateurIds.Contains(r.Id)).ToList();
-        Acteurs = acteurs.Where(a => filmDto.ActeurIds.Contains(a.Id)).ToList();
-        Compositeurs = compositeurs.Where(c => filmDto.CompositeurIds.Contains(c.Id)).ToList();
+        Genres = genres.Where(g => filmDto.Genres.Contains(g.Nom)).ToList();
+        Pays = pays.Where(p => filmDto.Pays.Contains(p.Nom)).ToList();
+        Realisateurs = realisateurs.Where(r => filmDto.Realisateurs.Contains(r.Nom)).ToList();
+        Acteurs = acteurs.Where(a => filmDto.Acteurs.Contains(a.Nom)).ToList();
+        Compositeurs = compositeurs.Where(c => filmDto.Compositeurs.Contains(c.Nom)).ToList();
     }
 }
 

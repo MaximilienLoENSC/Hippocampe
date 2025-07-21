@@ -39,7 +39,7 @@ public class GenreController : ControllerBase
 
     // GET: api/genre/{id}/films
     [HttpGet("{id}/films")]
-    public async Task<ActionResult<IEnumerable<FilmOutputDto>>> GetFilmsDeGenre(int id)
+    public async Task<ActionResult<IEnumerable<FilmDto>>> GetFilmsDeGenre(int id)
     {
         var genre = await _context
             .Genres.Include(a => a.Films)
@@ -55,7 +55,7 @@ public class GenreController : ControllerBase
         if (genre == null)
             return NotFound($"Aucun genre trouvé avec l'ID {id}.");
 
-        var filmsDeGenre = genre.Films.Select(f => new FilmOutputDto(f)).ToList();
+        var filmsDeGenre = genre.Films.Select(f => new FilmDto(f)).ToList();
 
         return Ok(filmsDeGenre);
     }

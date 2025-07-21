@@ -14,7 +14,7 @@ public class FilmController : ControllerBase
 
     // GET: api/film
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<FilmOutputDto>>> GetFilms()
+    public async Task<ActionResult<IEnumerable<FilmDto>>> GetFilms()
     {
         var filmsDto = await _context
             .Films.Include(f => f.Genres)
@@ -22,7 +22,7 @@ public class FilmController : ControllerBase
             .Include(f => f.Realisateurs)
             .Include(f => f.Acteurs)
             .Include(f => f.Compositeurs)
-            .Select(f => new FilmOutputDto(f))
+            .Select(f => new FilmDto(f))
             .ToListAsync();
 
         return filmsDto;
@@ -51,28 +51,30 @@ public class FilmController : ControllerBase
     public async Task<ActionResult<Film>> PostFilm([FromBody] FilmDto filmDto)
     {
         if (filmDto.DateDeSortie == DateTime.MinValue)
-            return BadRequest("La date renseignée ne correspond pas au format attendu YYYY-MM-DD.");
+            return BadRequest("Date de sortie invalide.");
 
-        var genres = await _context
-            .Genres.Where(g => filmDto.GenreIds.Contains(g.Id))
-            .ToListAsync();
-        var pays = await _context.Pays.Where(p => filmDto.PaysIds.Contains(p.Id)).ToListAsync();
-        var realisateurs = await _context
-            .Realisateurs.Where(r => filmDto.RealisateurIds.Contains(r.Id))
-            .ToListAsync();
-        var acteurs = await _context
-            .Acteurs.Where(a => filmDto.ActeurIds.Contains(a.Id))
-            .ToListAsync();
-        var compositeurs = await _context
-            .Compositeurs.Where(c => filmDto.CompositeurIds.Contains(c.Id))
-            .ToListAsync();
+        var genres = await GetOrCreateEntitiesAsync<Genre>(filmDto.Genres);
+        var pays = await GetOrCreateEntitiesAsync<Pays>(filmDto.Pays);
+        var realisateurs = await GetOrCreateEntitiesAsync<Realisateur>(filmDto.Realisateurs);
+        var acteurs = await GetOrCreateEntitiesAsync<Acteur>(filmDto.Acteurs);
+        var compositeurs = await GetOrCreateEntitiesAsync<Compositeur>(filmDto.Compositeurs);
 
-        var film = new Film(filmDto, genres, pays, realisateurs, acteurs, compositeurs);
+        var film = new Film
+        {
+            Titre = filmDto.Titre,
+            DateDeSortie = filmDto.DateDeSortie,
+            Commentaire = filmDto.Commentaire,
+            Genres = genres,
+            Pays = pays,
+            Realisateurs = realisateurs,
+            Acteurs = acteurs,
+            Compositeurs = compositeurs,
+        };
 
         _context.Films.Add(film);
         await _context.SaveChangesAsync();
 
-        return CreatedAtAction(nameof(GetFilm), new { id = film.Id }, film);
+        return CreatedAtAction(nameof(GetFilm), new { id = film.Id }, new FilmDto(film));
     }
 
     // PUT: api/film/{id}
@@ -80,42 +82,29 @@ public class FilmController : ControllerBase
     public async Task<IActionResult> PutFilm(int id, [FromBody] FilmDto filmDto)
     {
         if (id != filmDto.Id)
-            return BadRequest(
-                "L'id du film dans l'URL ne correspond pas à celui du corps de la requête."
-            );
+            return BadRequest("L'ID dans l'URL ne correspond pas à celui du film.");
 
-        if (filmDto.DateDeSortie == DateTime.MinValue)
-            return BadRequest("La date renseignée ne correspond pas au format attendu YYYY-MM-DD.");
+        var film = await _context
+            .Films.Include(f => f.Genres)
+            .Include(f => f.Pays)
+            .Include(f => f.Realisateurs)
+            .Include(f => f.Acteurs)
+            .Include(f => f.Compositeurs)
+            .FirstOrDefaultAsync(f => f.Id == id);
 
-        var genres = await _context
-            .Genres.Where(g => filmDto.GenreIds.Contains(g.Id))
-            .ToListAsync();
-        var pays = await _context.Pays.Where(p => filmDto.PaysIds.Contains(p.Id)).ToListAsync();
-        var realisateurs = await _context
-            .Realisateurs.Where(r => filmDto.RealisateurIds.Contains(r.Id))
-            .ToListAsync();
-        var acteurs = await _context
-            .Acteurs.Where(a => filmDto.ActeurIds.Contains(a.Id))
-            .ToListAsync();
-        var compositeurs = await _context
-            .Compositeurs.Where(c => filmDto.CompositeurIds.Contains(c.Id))
-            .ToListAsync();
+        if (film == null)
+            return NotFound($"Film ID {id} introuvable.");
 
-        var film = new Film(filmDto, genres, pays, realisateurs, acteurs, compositeurs);
+        film.Titre = filmDto.Titre;
+        film.DateDeSortie = filmDto.DateDeSortie;
+        film.Commentaire = filmDto.Commentaire;
+        film.Genres = await GetOrCreateEntitiesAsync<Genre>(filmDto.Genres);
+        film.Pays = await GetOrCreateEntitiesAsync<Pays>(filmDto.Pays);
+        film.Realisateurs = await GetOrCreateEntitiesAsync<Realisateur>(filmDto.Realisateurs);
+        film.Acteurs = await GetOrCreateEntitiesAsync<Acteur>(filmDto.Acteurs);
+        film.Compositeurs = await GetOrCreateEntitiesAsync<Compositeur>(filmDto.Compositeurs);
 
-        _context.Entry(film).State = EntityState.Modified;
-
-        try
-        {
-            await _context.SaveChangesAsync();
-        }
-        catch (DbUpdateConcurrencyException)
-        {
-            if (!_context.Films.Any(f => f.Id == id))
-                return NotFound($"Aucun film trouvé avec l'id {id}.");
-            else
-                throw;
-        }
+        await _context.SaveChangesAsync();
 
         return NoContent();
     }
@@ -133,5 +122,23 @@ public class FilmController : ControllerBase
         await _context.SaveChangesAsync();
 
         return NoContent();
+    }
+
+    //Utilisation pour de la comparaison d'éléments e classes filles de INommable avec ceux présnets dans la BDD
+    private async Task<List<T>> GetOrCreateEntitiesAsync<T>(List<string> noms)
+        where T : class, INommable, new()
+    {
+        var results = new List<T>();
+        foreach (var nom in noms.Distinct())
+        {
+            var entity = await _context.Set<T>().FirstOrDefaultAsync(e => e.Nom == nom);
+            if (entity == null)
+            {
+                entity = new T { Nom = nom };
+                _context.Set<T>().Add(entity);
+            }
+            results.Add(entity);
+        }
+        return results;
     }
 }

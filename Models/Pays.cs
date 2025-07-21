@@ -1,4 +1,4 @@
-public class Pays
+public class Pays : INommable
 {
     public int Id { get; set; }
     public string Nom { get; set; } = null!;
