@@ -8,9 +8,6 @@ public class RealisateurDto
     [JsonPropertyName("nom")]
     public string Nom { get; set; } = null!;
 
-    [JsonPropertyName("prenom")]
-    public string Prenom { get; set; } = null!;
-
     [JsonPropertyName("films")]
     public List<string> Films { get; set; } = new();
 
@@ -20,7 +17,6 @@ public class RealisateurDto
     {
         Id = realisateur.Id;
         Nom = realisateur.Nom;
-        Prenom = realisateur.Prenom;
         Films = realisateur.Films.Select(f => f.Titre).ToList();
     }
 }

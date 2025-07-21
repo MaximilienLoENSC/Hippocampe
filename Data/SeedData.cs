@@ -13,13 +13,13 @@ public static class SeedData
 
         Pays pays = new() { Nom = "Nouvelle Zélande" };
 
-        Realisateur realisateur = new() { Nom = "Campion", Prenom = "Jane" };
+        Realisateur realisateur = new() { Nom = "Jane Campion" };
         context.Realisateurs.AddRange(realisateur);
 
-        Acteur acteur = new() { Nom = "Hunter", Prenom = "Holly" };
+        Acteur acteur = new() { Nom = "Holly Hunter" };
         context.Acteurs.AddRange(acteur);
 
-        Compositeur compositeur = new() { Nom = "Nyman", Prenom = "Mickael" };
+        Compositeur compositeur = new() { Nom = "Mickael Nyman" };
         context.Compositeurs.AddRange(compositeur);
 
         Film film = new()

@@ -4,7 +4,6 @@ public class Compositeur
 {
     public int Id { get; set; }
     public string Nom { get; set; } = null!;
-    public string Prenom { get; set; } = null!;
     public List<Film> Films { get; set; } = new();
 
     public Compositeur() { }
@@ -16,11 +15,5 @@ public class Compositeur
 
         Id = compositeurDto.Id;
         Nom = compositeurDto.Nom;
-        Prenom = compositeurDto.Prenom;
-    }
-
-    public List<Film> GetFilms(List<Film> films)
-    {
-        return films.Where(f => f.Compositeurs.Any(a => a.Id == Id)).ToList();
     }
 }

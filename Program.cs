@@ -1,4 +1,4 @@
-//SeedData.Init();
+SeedData.Init();
 
 var builder = WebApplication.CreateBuilder(args);
 

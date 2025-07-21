@@ -41,8 +41,8 @@ public class FilmOutputDto
 
         Genres = film.Genres.Select(g => g.Nom).ToList();
         Pays = film.Pays.Select(p => p.Nom).ToList();
-        Realisateurs = film.Realisateurs.Select(r => $"{r.Prenom} {r.Nom}").ToList();
-        Acteurs = film.Acteurs.Select(a => $"{a.Prenom} {a.Nom}").ToList();
-        Compositeurs = film.Compositeurs.Select(c => $"{c.Prenom} {c.Nom}").ToList();
+        Realisateurs = film.Realisateurs.Select(r => r.Nom).ToList();
+        Acteurs = film.Acteurs.Select(a => a.Nom).ToList();
+        Compositeurs = film.Compositeurs.Select(c => c.Nom).ToList();
     }
 }
