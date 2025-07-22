@@ -1,4 +1,4 @@
-//SeedData.Init();
+SeedData.Init();
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,7 +13,7 @@ builder.Services.AddSwaggerGen();
 
 // Add the database context to the application
 // This will allow the application to interact with the database
-builder.Services.AddDbContext<DataContext>();
+builder.Services.AddDbContext<FilmContext>();
 
 var app = builder.Build();
 
@@ -23,6 +23,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseDefaultFiles();
+app.UseStaticFiles();
 
 app.UseHttpsRedirection();
 app.MapControllers();

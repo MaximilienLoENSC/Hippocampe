@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Hippocampe</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Mes Films</h1>
+
+    <h3>Ajouter un film</h3>
+    <form onsubmit="addFilm(); return false;">
+        <input type="text" id="titre" placeholder="Titre" required>
+        <input type="date" id="date_de_sortie" required>
+        <input type="text" id="genres" placeholder="Genres">
+        <input type="text" id="pays" placeholder="Pays">
+        <input type="text" id="realisateurs" placeholder="Réalisateurs">
+        <input type="text" id="acteurs" placeholder="Acteurs">
+        <input type="text" id="compositeurs" placeholder="Compositeurs">
+        <input type="text" id="commentaire" placeholder="Commentaire">
+        <input type="submit" value="Ajouter">
+    </form>
+
+    <div id="editForm">
+        <h3>Modifier un film</h3>
+        <form onsubmit="updateFilm(); return false;">
+            <input type="hidden" id="edit-id">
+            <input type="text" id="edit-titre" placeholder="Titre">
+            <input type="date" id="edit-date">
+            <input type="text" id="edit-genres" placeholder="Genres">
+            <input type="text" id="edit-pays" placeholder="Pays">
+            <input type="text" id="edit-realisateurs" placeholder="Réalisateurs">
+            <input type="text" id="edit-acteurs" placeholder="Acteurs">
+            <input type="text" id="edit-compositeurs" placeholder="Compositeurs">
+            <input type="text" id="edit-commentaire" placeholder="Commentaire">
+            <input type="submit" value="Enregistrer">
+            <a onclick="closeEdit()" aria-label="Close">&#10006;</a>
+        </form>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Titre</th>
+                <th>Date</th>
+                <th>Genres</th>
+                <th>Pays</th>
+                <th>Réalisateurs</th>
+                <th>Acteurs</th>
+                <th>Compositeurs</th>
+                <th>Commentaire</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="film-list"></tbody>
+    </table>
+
+    <script src="script.js"></script>
+</body>
+</html>

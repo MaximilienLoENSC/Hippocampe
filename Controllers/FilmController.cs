@@ -5,9 +5,9 @@ using Microsoft.EntityFrameworkCore;
 [Route("api/film")]
 public class FilmController : ControllerBase
 {
-    private readonly DataContext _context;
+    private readonly FilmContext _context;
 
-    public FilmController(DataContext context)
+    public FilmController(FilmContext context)
     {
         _context = context;
     }

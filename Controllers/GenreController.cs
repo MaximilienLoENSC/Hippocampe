@@ -5,9 +5,9 @@ using Microsoft.EntityFrameworkCore;
 [Route("api/genre")]
 public class GenreController : ControllerBase
 {
-    private readonly DataContext _context;
+    private readonly FilmContext _context;
 
-    public GenreController(DataContext context)
+    public GenreController(FilmContext context)
     {
         _context = context;
     }
@@ -23,23 +23,23 @@ public class GenreController : ControllerBase
         return Ok(genresDto);
     }
 
-    // GET: api/genre/{id}
-    [HttpGet("{id}")]
-    public async Task<ActionResult<GenreDto>> GetGenre(int id)
+    // GET: api/genre/{nom}
+    [HttpGet("{nom}")]
+    public async Task<ActionResult<GenreDto>> GetGenre(string nom)
     {
         var genre = await _context
             .Genres.Include(a => a.Films)
-            .FirstOrDefaultAsync(a => a.Id == id);
+            .FirstOrDefaultAsync(a => a.Nom == nom);
 
         if (genre == null)
-            return NotFound($"Aucun genre trouvé avec l'ID {id}.");
+            return NotFound($"Aucun genre trouvé avec le nom{nom}.");
 
         return new GenreDto(genre);
     }
 
     // GET: api/genre/{id}/films
     [HttpGet("{id}/films")]
-    public async Task<ActionResult<IEnumerable<FilmDto>>> GetFilmsDeGenre(int id)
+    public async Task<ActionResult<IEnumerable<FilmDto>>> GetFilmsDeGenre(string nom)
     {
         var genre = await _context
             .Genres.Include(a => a.Films)
@@ -50,10 +50,10 @@ public class GenreController : ControllerBase
             .ThenInclude(f => f.Realisateurs)
             .Include(a => a.Films)
             .ThenInclude(f => f.Compositeurs)
-            .FirstOrDefaultAsync(a => a.Id == id);
+            .FirstOrDefaultAsync(a => a.Nom == nom);
 
         if (genre == null)
-            return NotFound($"Aucun genre trouvé avec l'ID {id}.");
+            return NotFound($"Aucun genre trouvé avec l'ID {nom}.");
 
         var filmsDeGenre = genre.Films.Select(f => new FilmDto(f)).ToList();
 

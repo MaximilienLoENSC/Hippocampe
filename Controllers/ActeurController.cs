@@ -5,9 +5,9 @@ using Microsoft.EntityFrameworkCore;
 [Route("api/acteur")]
 public class ActeurController : ControllerBase
 {
-    private readonly DataContext _context;
+    private readonly FilmContext _context;
 
-    public ActeurController(DataContext context)
+    public ActeurController(FilmContext context)
     {
         _context = context;
     }
@@ -23,23 +23,23 @@ public class ActeurController : ControllerBase
         return Ok(acteursDto);
     }
 
-    // GET: api/acteur/{id}
-    [HttpGet("{id}")]
-    public async Task<ActionResult<ActeurDto>> GetActeur(int id)
+    // GET: api/acteur/{nom}
+    [HttpGet("{nom}")]
+    public async Task<ActionResult<ActeurDto>> GetActeur(string nom)
     {
         var acteur = await _context
             .Acteurs.Include(a => a.Films)
-            .FirstOrDefaultAsync(a => a.Id == id);
+            .FirstOrDefaultAsync(a => a.Nom == nom);
 
         if (acteur == null)
-            return NotFound($"Aucun acteur trouvé avec l'ID {id}.");
+            return NotFound($"Aucun acteur trouvé avec le nom {nom}.");
 
         return new ActeurDto(acteur);
     }
 
-    // GET: api/acteur/{id}/films
-    [HttpGet("{id}/films")]
-    public async Task<ActionResult<IEnumerable<FilmDto>>> GetFilmsDeActeur(int id)
+    // GET: api/acteur/{nom}/films
+    [HttpGet("{nom}/films")]
+    public async Task<ActionResult<IEnumerable<FilmDto>>> GetFilmsDeActeur(string nom)
     {
         var acteur = await _context
             .Acteurs.Include(a => a.Films)
@@ -50,10 +50,10 @@ public class ActeurController : ControllerBase
             .ThenInclude(f => f.Realisateurs)
             .Include(a => a.Films)
             .ThenInclude(f => f.Compositeurs)
-            .FirstOrDefaultAsync(a => a.Id == id);
+            .FirstOrDefaultAsync(a => a.Nom == nom);
 
         if (acteur == null)
-            return NotFound($"Aucun acteur trouvé avec l'ID {id}.");
+            return NotFound($"Aucun acteur trouvé avec le nom {nom}.");
 
         var filmsDeActeur = acteur.Films.Select(f => new FilmDto(f)).ToList();
 

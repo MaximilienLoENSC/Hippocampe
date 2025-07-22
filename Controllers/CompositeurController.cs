@@ -5,9 +5,9 @@ using Microsoft.EntityFrameworkCore;
 [Route("api/compositeur")]
 public class CompositeurController : ControllerBase
 {
-    private readonly DataContext _context;
+    private readonly FilmContext _context;
 
-    public CompositeurController(DataContext context)
+    public CompositeurController(FilmContext context)
     {
         _context = context;
     }
@@ -23,23 +23,23 @@ public class CompositeurController : ControllerBase
         return Ok(compositeursDto);
     }
 
-    // GET: api/compositeur/{id}
-    [HttpGet("{id}")]
-    public async Task<ActionResult<CompositeurDto>> GetCompositeur(int id)
+    // GET: api/compositeur/{nom}
+    [HttpGet("{nom}")]
+    public async Task<ActionResult<CompositeurDto>> GetCompositeur(string nom)
     {
         var compositeur = await _context
             .Compositeurs.Include(a => a.Films)
-            .FirstOrDefaultAsync(a => a.Id == id);
+            .FirstOrDefaultAsync(a => a.Nom == nom);
 
         if (compositeur == null)
-            return NotFound($"Aucun compositeur trouvé avec l'ID {id}.");
+            return NotFound($"Aucun compositeur trouvé avec le nom {nom}.");
 
         return new CompositeurDto(compositeur);
     }
 
-    // GET: api/compositeur/{id}/films
-    [HttpGet("{id}/films")]
-    public async Task<ActionResult<IEnumerable<FilmDto>>> GetFilmsDeCompositeur(int id)
+    // GET: api/compositeur/{nom}/films
+    [HttpGet("{nom}/films")]
+    public async Task<ActionResult<IEnumerable<FilmDto>>> GetFilmsDeCompositeur(string nom)
     {
         var compositeur = await _context
             .Compositeurs.Include(a => a.Films)
@@ -50,10 +50,10 @@ public class CompositeurController : ControllerBase
             .ThenInclude(f => f.Realisateurs)
             .Include(a => a.Films)
             .ThenInclude(f => f.Compositeurs)
-            .FirstOrDefaultAsync(a => a.Id == id);
+            .FirstOrDefaultAsync(a => a.Nom == nom);
 
         if (compositeur == null)
-            return NotFound($"Aucun compositeur trouvé avec l'ID {id}.");
+            return NotFound($"Aucun compositeur trouvé avec le nom {nom}.");
 
         var filmsDeCompositeur = compositeur.Films.Select(f => new FilmDto(f)).ToList();
 

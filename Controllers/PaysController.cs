@@ -5,9 +5,9 @@ using Microsoft.EntityFrameworkCore;
 [Route("api/pays")]
 public class PaysController : ControllerBase
 {
-    private readonly DataContext _context;
+    private readonly FilmContext _context;
 
-    public PaysController(DataContext context)
+    public PaysController(FilmContext context)
     {
         _context = context;
     }
@@ -23,21 +23,21 @@ public class PaysController : ControllerBase
         return Ok(paysDto);
     }
 
-    // GET: api/pays/{id}
-    [HttpGet("{id}")]
-    public async Task<ActionResult<PaysDto>> GetPays(int id)
+    // GET: api/pays/{nom}
+    [HttpGet("{nom}")]
+    public async Task<ActionResult<PaysDto>> GetPays(string nom)
     {
-        var pays = await _context.Pays.Include(a => a.Films).FirstOrDefaultAsync(a => a.Id == id);
+        var pays = await _context.Pays.Include(a => a.Films).FirstOrDefaultAsync(a => a.Nom == nom);
 
         if (pays == null)
-            return NotFound($"Aucun pays trouvé avec l'ID {id}.");
+            return NotFound($"Aucun pays trouvé avec le nom {nom}.");
 
         return new PaysDto(pays);
     }
 
-    // GET: api/pays/{id}/films
-    [HttpGet("{id}/films")]
-    public async Task<ActionResult<IEnumerable<FilmDto>>> GetFilmsDePays(int id)
+    // GET: api/pays/{nom}/films
+    [HttpGet("{nom}/films")]
+    public async Task<ActionResult<IEnumerable<FilmDto>>> GetFilmsDePays(string nom)
     {
         var pays = await _context
             .Pays.Include(a => a.Films)
@@ -48,10 +48,10 @@ public class PaysController : ControllerBase
             .ThenInclude(f => f.Realisateurs)
             .Include(a => a.Films)
             .ThenInclude(f => f.Compositeurs)
-            .FirstOrDefaultAsync(a => a.Id == id);
+            .FirstOrDefaultAsync(a => a.Nom == nom);
 
         if (pays == null)
-            return NotFound($"Aucun pays trouvé avec l'ID {id}.");
+            return NotFound($"Aucun pays trouvé avec le nom {nom}.");
 
         var filmsDePays = pays.Films.Select(f => new FilmDto(f)).ToList();
 

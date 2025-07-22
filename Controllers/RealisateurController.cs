@@ -5,9 +5,9 @@ using Microsoft.EntityFrameworkCore;
 [Route("api/realisateur")]
 public class RealisateurController : ControllerBase
 {
-    private readonly DataContext _context;
+    private readonly FilmContext _context;
 
-    public RealisateurController(DataContext context)
+    public RealisateurController(FilmContext context)
     {
         _context = context;
     }
@@ -23,23 +23,23 @@ public class RealisateurController : ControllerBase
         return Ok(realisateursDto);
     }
 
-    // GET: api/realisateur/{id}
-    [HttpGet("{id}")]
-    public async Task<ActionResult<RealisateurDto>> GetRealisateur(int id)
+    // GET: api/realisateur/{nom}
+    [HttpGet("{nom}")]
+    public async Task<ActionResult<RealisateurDto>> GetRealisateur(string nom)
     {
         var realisateur = await _context
             .Realisateurs.Include(a => a.Films)
-            .FirstOrDefaultAsync(a => a.Id == id);
+            .FirstOrDefaultAsync(a => a.Nom == nom);
 
         if (realisateur == null)
-            return NotFound($"Aucun realisateur trouvé avec l'ID {id}.");
+            return NotFound($"Aucun realisateur trouvé avec le nom {nom}.");
 
         return new RealisateurDto(realisateur);
     }
 
-    // GET: api/realisateur/{id}/films
-    [HttpGet("{id}/films")]
-    public async Task<ActionResult<IEnumerable<FilmDto>>> GetFilmsDeRealisateur(int id)
+    // GET: api/realisateur/{nom}/films
+    [HttpGet("{nom}/films")]
+    public async Task<ActionResult<IEnumerable<FilmDto>>> GetFilmsDeRealisateur(string nom)
     {
         var realisateur = await _context
             .Realisateurs.Include(a => a.Films)
@@ -50,10 +50,10 @@ public class RealisateurController : ControllerBase
             .ThenInclude(f => f.Realisateurs)
             .Include(a => a.Films)
             .ThenInclude(f => f.Compositeurs)
-            .FirstOrDefaultAsync(a => a.Id == id);
+            .FirstOrDefaultAsync(a => a.Nom == nom);
 
         if (realisateur == null)
-            return NotFound($"Aucun realisateur trouvé avec l'ID {id}.");
+            return NotFound($"Aucun realisateur trouvé avec le nom {nom}.");
 
         var filmsDeRealisateur = realisateur.Films.Select(f => new FilmDto(f)).ToList();
 

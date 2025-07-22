@@ -3,7 +3,7 @@ public static class SeedData
     // Test data for part 1 and 2
     public static void Init()
     {
-        using var context = new DataContext();
+        using var context = new FilmContext();
 
         Genre drame = new() { Nom = "Drame" };
         context.Genres.AddRange(drame);

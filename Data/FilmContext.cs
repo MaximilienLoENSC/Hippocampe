@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-public class DataContext : DbContext
+public class FilmContext : DbContext
 {
     public DbSet<Film> Films { get; set; } = null!;
     public DbSet<Genre> Genres { get; set; } = null!;
@@ -10,7 +10,7 @@ public class DataContext : DbContext
     public DbSet<Compositeur> Compositeurs { get; set; } = null!;
     public string DbPath { get; private set; }
 
-    public DataContext()
+    public FilmContext()
     {
         // Path to SQLite database file
         DbPath = "ApiHippocampe.db";
